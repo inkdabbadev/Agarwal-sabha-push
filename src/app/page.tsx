@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="poster-center">
             <div className="poster-center__glow" />
 
-            <div className="poster-center__art">
+            <div className="poster-center__art poster-center__art--home">
               <div className="poster-center__logo-shell">
                 <Image
                   src="/assets/platinum-jubilee-logo.png"

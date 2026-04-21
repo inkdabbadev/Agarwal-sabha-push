@@ -94,7 +94,7 @@ textarea {
 }
 
 .poster-header {
-  padding: 1.5rem 1rem 0;
+  padding: 1.25rem 1rem 0;
 }
 
 .poster-header--compact {
@@ -134,8 +134,8 @@ textarea {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 1rem 1rem 1.5rem;
+  gap: 1.25rem;
+  padding: 0.75rem 1rem 1.5rem;
 }
 
 .poster-center__glow {
@@ -156,35 +156,40 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   text-align: center;
+  width: 100%;
 }
 
 .poster-center__logo-shell {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .poster-center__logo {
-  width: min(70vw, 18rem);
+  width: min(68vw, 16rem);
   height: auto;
 }
 
 .poster-event-panel {
   width: 100%;
-  max-width: 44rem;
+  max-width: 30rem;
+  margin: 0 auto;
 }
 
 .poster-event-panel__title {
-  width: min(100%, 18rem);
+  width: min(100%, 15rem);
   height: auto;
+  margin: 0 auto;
 }
 
 .poster-event-panel__date-wrap {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-top: 1rem;
+  justify-content: center;
+  margin-top: 0.85rem;
 }
 
 .poster-event-panel__line {
@@ -193,21 +198,21 @@ textarea {
 }
 
 .poster-event-panel__date {
-  width: min(100%, 26rem);
+  width: min(100%, 18rem);
   height: auto;
 }
 
 .poster-event-panel__copy {
-  max-width: 42rem;
-  margin: 1.15rem auto 0;
+  max-width: 26rem;
+  margin: 1rem auto 0;
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.98rem;
-  line-height: 1.8;
+  line-height: 1.65;
 }
 
 .poster-center__actions {
   width: 100%;
-  max-width: 34rem;
+  max-width: 30rem;
   margin: 0 auto;
 }
 
@@ -275,12 +280,12 @@ textarea {
 .event-info-hero {
   display: grid;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 1rem 0;
+  gap: 1.25rem;
+  padding: 0.75rem 1rem 0;
 }
 
 .event-info-hero__copy {
-  max-width: 42rem;
+  max-width: 34rem;
 }
 
 .event-info-hero__back-link {
@@ -305,15 +310,15 @@ textarea {
   margin: 0.8rem 0 0;
   color: white;
   font-family: var(--font-heading), serif;
-  font-size: clamp(2.5rem, 7vw, 4rem);
-  line-height: 0.98;
+  font-size: clamp(2.3rem, 8vw, 4rem);
+  line-height: 1.02;
 }
 
 .event-info-hero__description {
-  margin: 1rem 0 0;
+  margin: 0.8rem 0 0;
   color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
-  line-height: 1.8;
+  line-height: 1.65;
 }
 
 .event-info-hero__art {
@@ -322,15 +327,15 @@ textarea {
 }
 
 .event-info-hero__logo {
-  width: min(62vw, 16rem);
+  width: min(58vw, 14rem);
   height: auto;
 }
 
 .event-info-layout {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
 }
 
 .event-info-layout__side {
@@ -342,8 +347,8 @@ textarea {
 .event-schedule-grid {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 1.25rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .simple-shell {
@@ -354,8 +359,8 @@ textarea {
 }
 
 .simple-section {
-  padding: 1.5rem;
-  border-radius: 1.75rem;
+  padding: 1.25rem;
+  border-radius: 1.5rem;
   background: rgba(255, 255, 255, 0.08);
   color: white;
 }
@@ -370,11 +375,11 @@ textarea {
 }
 
 .simple-list-item {
-  padding: 0.25rem 0 1rem;
+  padding: 0.2rem 0 0.95rem;
 }
 
 .simple-list-item:not(:last-child) {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.2rem;
 }
 
 .admin-layout {
@@ -383,42 +388,46 @@ textarea {
   gap: 1.5rem;
 }
 
+.simple-section--info {
+  background: rgba(255, 255, 255, 0.07);
+}
+
 @media (min-width: 640px) {
   .poster-header {
-    padding: 1.9rem 1.5rem 0;
+    padding: 1.6rem 1.5rem 0;
   }
 
   .poster-center {
-    gap: 2rem;
-    padding: 1.25rem 1.5rem 2rem;
+    gap: 1.6rem;
+    padding: 1rem 1.5rem 1.9rem;
   }
 
   .poster-center__logo {
-    width: min(56vw, 21rem);
-  }
-
-  .poster-detail-card {
-    padding: 1.8rem;
+    width: min(52vw, 18rem);
   }
 
   .event-info-hero {
-    padding: 1.25rem 1.5rem 0;
+    padding: 1rem 1.5rem 0;
+  }
+
+  .simple-section {
+    padding: 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .poster-center {
     flex-direction: row;
-    align-items: stretch;
-    gap: 2rem;
-    padding: 1.5rem 2rem 2.2rem;
+    align-items: center;
+    gap: 2.25rem;
+    padding: 1.2rem 2rem 2.2rem;
   }
 
   .poster-center__art {
     display: grid;
-    grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr);
+    grid-template-columns: minmax(13rem, 19rem) minmax(0, 1fr);
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     text-align: left;
   }
 
@@ -427,17 +436,34 @@ textarea {
   }
 
   .poster-center__logo {
-    width: min(100%, 18rem);
+    width: min(100%, 16rem);
   }
 
   .poster-center__actions {
     max-width: 24rem;
-    align-self: center;
+    align-self: stretch;
   }
 
   .poster-event-panel__copy {
     margin-left: 0;
     margin-right: 0;
+  }
+
+  .poster-event-panel {
+    max-width: 36rem;
+    margin: 0;
+  }
+
+  .poster-event-panel__title {
+    margin: 0;
+  }
+
+  .poster-event-panel__date-wrap {
+    justify-content: flex-start;
+  }
+
+  .poster-event-panel__date {
+    width: min(100%, 21rem);
   }
 
   .home-dashboard {
@@ -451,16 +477,17 @@ textarea {
 
   .event-info-hero {
     grid-template-columns: minmax(0, 1fr) auto;
-    padding: 1.3rem 2rem 0;
+    padding: 1.1rem 2rem 0;
+    gap: 1rem;
   }
 
   .event-info-hero__logo {
-    width: min(22vw, 18rem);
+    width: min(20vw, 15rem);
   }
 
   .event-info-layout {
     flex-direction: row;
-    gap: 1.25rem;
+    gap: 1rem;
   }
 
   .event-info-layout > :first-child {
@@ -468,8 +495,8 @@ textarea {
   }
 
   .event-info-layout__side {
-    width: 24rem;
-    flex: 0 0 24rem;
+    width: 22rem;
+    flex: 0 0 22rem;
   }
 
   .admin-layout {

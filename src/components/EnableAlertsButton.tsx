@@ -258,12 +258,12 @@ export function EnableAlertsButton({
         <p className="text-sm leading-6 text-white/78">{description}</p>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
         <button
           type="button"
           onClick={() => void enableAlerts(false)}
           disabled={status === "enabling"}
-          className="inline-flex items-center justify-center rounded-full bg-[#d9b169] px-5 py-3 text-sm font-semibold text-[#122f41] shadow-card transition hover:bg-[#e3bd79] focus:outline-none focus:ring-2 focus:ring-[#d9b169]/45 focus:ring-offset-2 focus:ring-offset-[#0f3144] disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#d9b169] px-5 py-3 text-sm font-semibold text-[#122f41] shadow-card transition hover:bg-[#e3bd79] focus:outline-none focus:ring-2 focus:ring-[#d9b169]/45 focus:ring-offset-2 focus:ring-offset-[#0f3144] disabled:cursor-not-allowed disabled:opacity-70 sm:flex-1"
         >
           {status === "enabling"
             ? "Enabling..."
@@ -273,7 +273,7 @@ export function EnableAlertsButton({
         </button>
         <a
           href="/event-info"
-          className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#0f3144]"
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#0f3144] sm:flex-1"
         >
           View Event Info
         </a>

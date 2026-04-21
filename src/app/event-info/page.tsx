@@ -73,7 +73,7 @@ export default function EventInfoPage() {
           </div>
 
           <div className="event-info-layout">
-            <section className="simple-section">
+            <section className="simple-section simple-section--info">
               <p className="poster-detail-card__eyebrow">Programme overview</p>
               <div className="event-schedule-grid">
                 {scheduleItems.map((item) => (
@@ -91,12 +91,12 @@ export default function EventInfoPage() {
             <div className="event-info-layout__side">
               <LiveAnnouncementPanel compact />
 
-              <section className="simple-section">
+              <section className="simple-section simple-section--info">
                 <p className="poster-detail-card__eyebrow">Venue and support</p>
                 <p className="poster-detail-card__copy">Follow venue signage and volunteer guidance.</p>
               </section>
 
-              <section className="simple-section">
+              <section className="simple-section simple-section--info">
                 <p className="poster-detail-card__eyebrow">Helpdesk and emergency</p>
                 <p className="poster-detail-card__copy">Please contact the nearest volunteer or helpdesk.</p>
               </section>
