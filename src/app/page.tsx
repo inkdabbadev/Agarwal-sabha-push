@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import { EnableAlertsButton } from "@/components/EnableAlertsButton";
 import { EventBrandHeader } from "@/components/EventBrandHeader";
-import { LiveAnnouncementPanel } from "@/components/LiveAnnouncementPanel";
 
 export default function HomePage() {
   return (
@@ -69,30 +68,6 @@ export default function HomePage() {
                 title="Enable Alerts"
                 description="Get live event updates."
               />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-shell relative z-[1] pb-12 pt-2 sm:pb-16">
-        <div className="home-dashboard">
-          <LiveAnnouncementPanel />
-
-          <div className="home-dashboard__cards">
-            <div className="simple-section">
-              <p className="poster-detail-card__eyebrow">75th Platinum Jubilee</p>
-              <h2 className="poster-detail-card__title">Stay updated during the event</h2>
-              <p className="poster-detail-card__copy">Keep this page open for live notices.</p>
-            </div>
-
-            <div className="simple-section simple-section--warm">
-              <p className="poster-detail-card__eyebrow">Event details</p>
-              <h2 className="poster-detail-card__title">View programme and support info</h2>
-              <p className="poster-detail-card__copy">Schedule, venue, and helpdesk details.</p>
-              <a href="/event-info" className="poster-detail-card__link">
-                Open event info
-                <span aria-hidden="true">-&gt;</span>
-              </a>
             </div>
           </div>
         </div>
