@@ -107,7 +107,6 @@ export function EnableAlertsButton({
   const [lastForegroundMessage, setLastForegroundMessage] = useState<string | null>(null);
   const [showIphoneTip, setShowIphoneTip] = useState(false);
   const [needsInstallFlow, setNeedsInstallFlow] = useState(false);
-  const [showStartupPrompt, setShowStartupPrompt] = useState(false);
   const hasAttemptedSilentSync = useRef(false);
 
   useEffect(() => {
@@ -130,7 +129,6 @@ export function EnableAlertsButton({
       if (!supported) {
         if (isActive) {
           setStatus("unsupported");
-          setShowStartupPrompt(false);
         }
         return;
       }
@@ -138,7 +136,6 @@ export function EnableAlertsButton({
       if (iphone && !installed) {
         if (isActive) {
           setStatus("needs-install");
-          setShowStartupPrompt(!compact);
         }
         return;
       }
@@ -165,14 +162,11 @@ export function EnableAlertsButton({
 
       if (Notification.permission === "granted" && !hasAttemptedSilentSync.current) {
         hasAttemptedSilentSync.current = true;
-        setShowStartupPrompt(false);
         await enableAlerts(true);
       } else if (Notification.permission === "denied") {
         setStatus("denied");
-        setShowStartupPrompt(false);
       } else {
         setStatus("idle");
-        setShowStartupPrompt(!compact);
       }
 
       return unsubscribe;
@@ -190,13 +184,11 @@ export function EnableAlertsButton({
   async function enableAlerts(skipPermissionPrompt = false) {
     setErrorMessage(null);
     setStatus("enabling");
-    setShowStartupPrompt(false);
 
     try {
       if (isLikelyIphone() && !isStandaloneMode()) {
         setNeedsInstallFlow(true);
         setStatus("needs-install");
-        setShowStartupPrompt(!compact);
         return;
       }
 
@@ -217,7 +209,6 @@ export function EnableAlertsButton({
 
       if (permission !== "granted") {
         setStatus(permission === "denied" ? "denied" : "idle");
-        setShowStartupPrompt(permission === "default" && !compact);
         return;
       }
 
@@ -249,105 +240,71 @@ export function EnableAlertsButton({
       const message = error instanceof Error ? error.message : "Unable to enable alerts.";
       setErrorMessage(message);
       setStatus("error");
-      setShowStartupPrompt(!compact);
     }
   }
 
   const statusCopy = getStatusCopy(status, errorMessage);
 
   return (
-    <>
-      {showStartupPrompt ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#071720]/78 px-4 pb-4 pt-10 backdrop-blur-sm sm:items-center sm:p-6">
-          <div className="w-full max-w-md rounded-[2rem] bg-[#102d3f] p-6 text-white shadow-soft">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#f6d8a0]">
-              Event alerts
-            </p>
-            <h3 className="mt-3 font-serif text-3xl text-white">Enable alerts</h3>
-            <p className="mt-3 text-sm leading-6 text-white/76">
-              Tap below to allow live updates for the event.
-            </p>
-            <div className="mt-5 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => void enableAlerts(false)}
-                disabled={status === "enabling"}
-                className="inline-flex items-center justify-center rounded-full bg-[#d9b169] px-5 py-3 text-sm font-semibold text-[#122f41] shadow-card transition hover:bg-[#e3bd79] focus:outline-none focus:ring-2 focus:ring-[#d9b169]/45 focus:ring-offset-2 focus:ring-offset-[#102d3f] disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {status === "enabling" ? "Enabling..." : "Enable Alerts"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowStartupPrompt(false)}
-                className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#102d3f]"
-              >
-                Continue without alerts
-              </button>
-            </div>
-          </div>
-        </div>
+    <div
+      className={`space-y-4 ${
+        compact
+          ? ""
+          : "rounded-[2rem] bg-[#0e2a3a]/72 p-5 text-white shadow-soft backdrop-blur sm:p-6"
+      }`}
+    >
+      <div className="space-y-2">
+        <h2 className="font-serif text-2xl text-[#f6d8a0]">{title}</h2>
+        <p className="text-sm leading-6 text-white/78">{description}</p>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={() => void enableAlerts(false)}
+          disabled={status === "enabling"}
+          className="inline-flex items-center justify-center rounded-full bg-[#d9b169] px-5 py-3 text-sm font-semibold text-[#122f41] shadow-card transition hover:bg-[#e3bd79] focus:outline-none focus:ring-2 focus:ring-[#d9b169]/45 focus:ring-offset-2 focus:ring-offset-[#0f3144] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {status === "enabling"
+            ? "Enabling..."
+            : status === "enabled"
+              ? "Alerts Enabled"
+              : "Enable Alerts"}
+        </button>
+        <a
+          href="/event-info"
+          className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#0f3144]"
+        >
+          View Event Info
+        </a>
+      </div>
+
+      <div className="rounded-[1.6rem] bg-white/6 p-4 text-sm text-white/78">
+        <p className="font-semibold uppercase tracking-[0.18em] text-[#f6d8a0]">
+          Support
+        </p>
+        <p className="mt-2 leading-6">
+          Best on Android Chrome. On iPhone, use Home Screen.
+        </p>
+      </div>
+
+      <StatusCard
+        title={statusCopy.title}
+        description={statusCopy.description}
+        tone={statusCopy.tone}
+      />
+
+      {lastForegroundMessage ? (
+        <StatusCard
+          title="Latest update"
+          description={lastForegroundMessage}
+          tone="success"
+        />
       ) : null}
 
-      <div
-        className={`space-y-4 ${
-          compact
-            ? ""
-            : "rounded-[2rem] bg-[#0e2a3a]/72 p-5 text-white shadow-soft backdrop-blur sm:p-6"
-        }`}
-      >
-        <div className="space-y-2">
-          <h2 className="font-serif text-2xl text-[#f6d8a0]">{title}</h2>
-          <p className="text-sm leading-6 text-white/78">{description}</p>
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={() => void enableAlerts(false)}
-            disabled={status === "enabling"}
-            className="inline-flex items-center justify-center rounded-full bg-[#d9b169] px-5 py-3 text-sm font-semibold text-[#122f41] shadow-card transition hover:bg-[#e3bd79] focus:outline-none focus:ring-2 focus:ring-[#d9b169]/45 focus:ring-offset-2 focus:ring-offset-[#0f3144] disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {status === "enabling"
-              ? "Enabling..."
-              : status === "enabled"
-                ? "Alerts Enabled"
-                : "Enable Alerts"}
-          </button>
-          <a
-            href="/event-info"
-            className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#0f3144]"
-          >
-            View Event Info
-          </a>
-        </div>
-
-        <div className="rounded-[1.6rem] bg-white/6 p-4 text-sm text-white/78">
-          <p className="font-semibold uppercase tracking-[0.18em] text-[#f6d8a0]">
-            Support
-          </p>
-          <p className="mt-2 leading-6">
-            Best on Android Chrome. On iPhone, use Home Screen.
-          </p>
-        </div>
-
-        <StatusCard
-          title={statusCopy.title}
-          description={statusCopy.description}
-          tone={statusCopy.tone}
-        />
-
-        {lastForegroundMessage ? (
-          <StatusCard
-            title="Latest update"
-            description={lastForegroundMessage}
-            tone="success"
-          />
-        ) : null}
-
-        {showIphoneTip ? (
-          <IphoneInstructions compact={compact} requiresInstall={needsInstallFlow} />
-        ) : null}
-      </div>
-    </>
+      {showIphoneTip ? (
+        <IphoneInstructions compact={compact} requiresInstall={needsInstallFlow} />
+      ) : null}
+    </div>
   );
 }
