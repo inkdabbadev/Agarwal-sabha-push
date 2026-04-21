@@ -57,32 +57,28 @@ export default function AdminPage() {
 
   return (
     <main className="section-shell py-6 sm:py-8">
-      <div className="glass-card overflow-hidden p-5 sm:p-8">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+      <div className="simple-shell p-5 sm:p-8">
+        <div className="admin-layout">
           <section className="space-y-4">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/70">
-              Admin Broadcast Console
+              Admin
             </p>
             <h1 className="font-serif text-4xl text-primary sm:text-5xl">
-              Send one clear message to every subscribed attendee
+              Send a live update
             </h1>
-            <p className="text-base leading-7 text-foreground/76">
-              This admin screen is intentionally simple for live event operations. Enter
-              the admin password, compose a short announcement, and send it to every
-              active subscription stored in Supabase.
-            </p>
+            <p className="text-base leading-7 text-foreground/76">Send one message to everyone.</p>
 
-            <div className="rounded-[2rem] border border-accent/20 bg-accent/10 p-5 shadow-card">
-              <h2 className="font-serif text-2xl text-primary">Broadcast notes</h2>
+            <div className="simple-section simple-section--light">
+              <h2 className="font-serif text-2xl text-primary">Notes</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-foreground/78">
-                <li>Keep titles short so they display cleanly on mobile notifications.</li>
-                <li>Use the message field for concise operational instructions.</li>
-                <li>Add an optional link to direct attendees to a page in this site.</li>
+                <li>Keep the title short.</li>
+                <li>Keep the message clear.</li>
+                <li>Link is optional.</li>
               </ul>
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-primary/10 bg-white/85 p-5 shadow-soft">
+          <section className="simple-section simple-section--light">
             <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)}>
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-semibold text-primary">
@@ -103,7 +99,7 @@ export default function AdminPage() {
 
               <div className="space-y-2">
                 <label htmlFor="title" className="text-sm font-semibold text-primary">
-                  Notification title
+                  Title
                 </label>
                 <input
                   id="title"
@@ -111,7 +107,7 @@ export default function AdminPage() {
                   required
                   maxLength={80}
                   className="field"
-                  placeholder="Example: Programme starting in 10 minutes"
+                  placeholder="Stage update"
                   value={form.title}
                   onChange={(event) =>
                     setForm((current) => ({ ...current, title: event.target.value }))
@@ -129,7 +125,7 @@ export default function AdminPage() {
                   maxLength={240}
                   rows={5}
                   className="field resize-none"
-                  placeholder="Share the announcement attendees should see."
+                  placeholder="Programme begins in 10 minutes."
                   value={form.message}
                   onChange={(event) =>
                     setForm((current) => ({ ...current, message: event.target.value }))
@@ -139,13 +135,13 @@ export default function AdminPage() {
 
               <div className="space-y-2">
                 <label htmlFor="link" className="text-sm font-semibold text-primary">
-                  Optional link
+                  Link
                 </label>
                 <input
                   id="link"
                   type="text"
                   className="field"
-                  placeholder="/event-info or https://example.com"
+                  placeholder="/event-info"
                   value={form.link}
                   onChange={(event) =>
                     setForm((current) => ({ ...current, link: event.target.value }))
@@ -154,7 +150,7 @@ export default function AdminPage() {
               </div>
 
               <button type="submit" disabled={isSubmitting} className="button-primary w-full">
-                {isSubmitting ? "Sending broadcast..." : "Send notification"}
+                {isSubmitting ? "Sending..." : "Send"}
               </button>
             </form>
 
@@ -170,10 +166,9 @@ export default function AdminPage() {
               >
                 {result.ok ? (
                   <p className="leading-6">
-                    Notification sent. Delivered attempts: {result.sent}. Failed attempts:{" "}
-                    {result.failed}.
+                    Sent. Delivered: {result.sent}. Failed: {result.failed}.
                     {typeof result.invalidated === "number"
-                      ? ` Invalid tokens marked inactive: ${result.invalidated}.`
+                      ? ` Inactive tokens: ${result.invalidated}.`
                       : ""}
                   </p>
                 ) : (

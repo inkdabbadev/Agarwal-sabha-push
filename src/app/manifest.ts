@@ -6,10 +6,11 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Agarwal Sabha",
     description:
       "Official event hub and live alert website for the Shree Agarwal Sabha Platinum Jubilee celebration.",
+    id: "/",
     start_url: "/",
     display: "standalone",
-    background_color: "#f9f4ec",
-    theme_color: "#6f1d2f",
+    background_color: "#0f3144",
+    theme_color: "#0f3144",
     icons: [
       {
         src: "/icon.svg",

@@ -75,6 +75,25 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabaseAdminClient();
+    const normalizedLink = normalizeNotificationLink(payload.link);
+
+    const { data: announcement, error: announcementError } = await supabase
+      .from("announcements")
+      .insert({
+        title: payload.title,
+        message: payload.message,
+        link: payload.link ? normalizedLink : null
+      })
+      .select("id")
+      .single();
+
+    const announcementTableMissing =
+      announcementError && "code" in announcementError && announcementError.code === "42P01";
+
+    if (announcementError && !announcementTableMissing) {
+      throw new Error(announcementError.message);
+    }
+
     const { data, error } = await supabase
       .from("push_subscriptions")
       .select("token")
@@ -87,12 +106,17 @@ export async function POST(request: Request) {
     const tokens = [...new Set((data ?? []).map((entry) => entry.token).filter(Boolean))];
 
     if (!tokens.length) {
-      return NextResponse.json({ ok: true, sent: 0, failed: 0, invalidated: 0 });
+      return NextResponse.json({
+        ok: true,
+        sent: 0,
+        failed: 0,
+        invalidated: 0,
+        announcementId: announcement?.id
+      });
     }
 
     const messaging = getFirebaseAdminMessaging();
     const chunks = splitIntoChunks(tokens, 500);
-    const normalizedLink = normalizeNotificationLink(payload.link);
 
     let sent = 0;
     let failed = 0;
@@ -146,7 +170,8 @@ export async function POST(request: Request) {
       ok: true,
       sent,
       failed,
-      invalidated: uniqueInvalidTokens.length
+      invalidated: uniqueInvalidTokens.length,
+      announcementId: announcement?.id
     });
   } catch (error) {
     return NextResponse.json(

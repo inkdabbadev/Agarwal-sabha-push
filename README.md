@@ -8,6 +8,8 @@ This project is a mobile-first event website built for the Shree Agarwal Sabha i
 
 Attendees open the website after joining the event Wi-Fi, enable browser notifications, and receive live announcements from the organizers. A simple admin console at `/admin` lets the event team broadcast one message to all subscribed attendees.
 
+Open attendee pages also receive live website alerts, so browsers without background push support can still show announcements while the site remains open.
+
 ## MVP workflow
 
 1. Attendee joins event Wi-Fi.
@@ -21,7 +23,7 @@ Attendees open the website after joining the event Wi-Fi, enable browser notific
 6. Organizer opens `/admin`.
 7. Organizer enters the admin password, title, message, and optional link.
 8. Organizer clicks `Send notification`.
-9. `/api/send-notification` fetches all active tokens and broadcasts the push notification through Firebase Admin SDK.
+9. `/api/send-notification` stores the announcement, updates the live website alert feed, and broadcasts the push notification through Firebase Admin SDK.
 
 ## Tech stack
 
@@ -40,15 +42,16 @@ Attendees open the website after joining the event Wi-Fi, enable browser notific
 - `/` is the event landing page with the notification opt-in experience.
 - `/event-info` is a simple static information page for the event.
 - `EnableAlertsButton` handles browser capability checks, service worker registration, FCM token generation, and subscription API calls.
+- `LiveAnnouncementPanel` refreshes the latest published message so attendees keeping the page open receive live website alerts in any browser.
 
 ### Admin broadcast flow
 
 - `/admin` is a simple password-protected sender form.
-- `/api/send-notification` validates the request, checks `ADMIN_PASSWORD`, fetches active tokens, sends notifications in 500-token batches, and deactivates invalid tokens.
+- `/api/send-notification` validates the request, checks `ADMIN_PASSWORD`, stores the announcement, fetches active tokens, sends notifications in 500-token batches, and deactivates invalid tokens.
 
 ### Data layer
 
-- Supabase stores one table: `push_subscriptions`.
+- Supabase stores `push_subscriptions` and `announcements`.
 - Each token is unique and updated via upsert.
 - Invalid tokens are marked inactive after permanent Firebase send failures.
 
@@ -63,6 +66,8 @@ Attendees open the website after joining the event Wi-Fi, enable browser notific
 |   |   |-- admin
 |   |   |   `-- page.tsx
 |   |   |-- api
+|   |   |   |-- latest-announcement
+|   |   |   |   `-- route.ts
 |   |   |   |-- send-notification
 |   |   |   |   `-- route.ts
 |   |   |   `-- subscribe
@@ -77,7 +82,9 @@ Attendees open the website after joining the event Wi-Fi, enable browser notific
 |   |   `-- page.tsx
 |   |-- components
 |   |   |-- EnableAlertsButton.tsx
+|   |   |-- EventBrandHeader.tsx
 |   |   |-- IphoneInstructions.tsx
+|   |   |-- LiveAnnouncementPanel.tsx
 |   |   `-- StatusCard.tsx
 |   |-- lib
 |   |   |-- firebase-admin.ts
@@ -89,6 +96,7 @@ Attendees open the website after joining the event Wi-Fi, enable browser notific
 |-- supabase
 |   `-- migrations
 |       `-- 001_create_push_subscriptions.sql
+|       `-- 002_create_announcements.sql
 |-- .env.example
 |-- next.config.mjs
 |-- package.json
@@ -103,8 +111,9 @@ Attendees open the website after joining the event Wi-Fi, enable browser notific
 1. Create a new Supabase project.
 2. Open the SQL editor.
 3. Run the SQL in [supabase/migrations/001_create_push_subscriptions.sql](./supabase/migrations/001_create_push_subscriptions.sql).
-4. Confirm the `push_subscriptions` table exists.
-5. Copy:
+4. Run the SQL in [supabase/migrations/002_create_announcements.sql](./supabase/migrations/002_create_announcements.sql).
+5. Confirm the `push_subscriptions` and `announcements` tables exist.
+6. Copy:
    - project URL
    - anon key
    - service role key
@@ -118,6 +127,14 @@ Table: `push_subscriptions`
 - `is_active boolean not null default true`
 - `created_at timestamptz not null default now()`
 - `updated_at timestamptz not null default now()`
+
+Table: `announcements`
+
+- `id uuid primary key default gen_random_uuid()`
+- `title text not null`
+- `message text not null`
+- `link text null`
+- `created_at timestamptz not null default now()`
 
 ## Firebase setup
 
@@ -218,6 +235,9 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nABC123...\n-----END PRIVATE K
 
 ### Broadcast sending
 
+- `/api/send-notification` stores the announcement in Supabase first.
+- `/api/latest-announcement` exposes the most recent announcement to attendee pages.
+- Open attendee pages poll for the latest announcement and update the live website alert card automatically.
 - `/api/send-notification` loads active tokens.
 - Tokens are deduplicated.
 - Notifications are sent in 500-token chunks to respect Firebase multicast limits.
@@ -247,7 +267,8 @@ The attendee UI includes a visible helper card explaining this.
 7. Enter the `ADMIN_PASSWORD`.
 8. Send a short test title and message.
 9. Confirm the subscribed phone receives the push notification.
-10. Repeat on iPhone using the Home Screen installation flow.
+10. Keep another browser tab open and confirm the live website alert updates there too.
+11. Repeat on iPhone using the Home Screen installation flow.
 
 ## Example admin send flow
 

@@ -30,37 +30,55 @@ function isLikelyIphone() {
   return /iPhone|iPad|iPod/i.test(platform) || /iPhone|iPad|iPod/i.test(userAgent);
 }
 
+function isStandaloneMode() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return (
+    window.matchMedia?.("(display-mode: standalone)")?.matches === true ||
+    window.matchMedia?.("(display-mode: fullscreen)")?.matches === true ||
+    ("standalone" in navigator &&
+      Boolean((navigator as Navigator & { standalone?: boolean }).standalone))
+  );
+}
+
 function getStatusCopy(status: AlertStatus, errorMessage: string | null) {
   switch (status) {
     case "checking":
       return {
-        title: "Checking support",
-        description: "We are verifying whether this device can receive event alerts.",
+        title: "Checking",
+        description: "Checking device support.",
         tone: "neutral" as const
       };
     case "enabling":
       return {
         title: "Enabling alerts",
-        description: "Please accept the browser prompt so we can deliver live updates during the celebration.",
+        description: "Please allow notifications.",
         tone: "neutral" as const
       };
     case "enabled":
       return {
-        title: "Alerts enabled successfully",
-        description: "You are subscribed to live announcements for the Platinum Jubilee event.",
+        title: "Alerts enabled",
+        description: "You will receive live updates.",
         tone: "success" as const
+      };
+    case "needs-install":
+      return {
+        title: "Open from Home Screen",
+        description: "On iPhone, install this site and open it from Home Screen.",
+        tone: "warning" as const
       };
     case "denied":
       return {
         title: "Permission denied",
-        description: "Notifications are blocked on this device. You can allow them later from your browser settings.",
+        description: "Please allow notifications in browser settings.",
         tone: "warning" as const
       };
     case "unsupported":
       return {
-        title: "Unsupported browser or device",
-        description:
-          "This browser does not currently support web push notifications for this experience.",
+        title: "Not supported",
+        description: "Push alerts are not supported on this browser.",
         tone: "warning" as const
       };
     case "error":
@@ -73,31 +91,37 @@ function getStatusCopy(status: AlertStatus, errorMessage: string | null) {
     default:
       return {
         title: "Alerts not enabled",
-        description: "Enable alerts to receive important live updates during the event.",
+        description: "Turn on alerts for live updates.",
         tone: "neutral" as const
       };
   }
 }
 
 export function EnableAlertsButton({
-  title = "Enable live event alerts",
-  description = "Enable alerts to receive important live updates during the event.",
+  title = "Enable Alerts",
+  description = "Turn on live updates.",
   compact = false
 }: EnableAlertsButtonProps) {
   const [status, setStatus] = useState<AlertStatus>("checking");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastForegroundMessage, setLastForegroundMessage] = useState<string | null>(null);
   const [showIphoneTip, setShowIphoneTip] = useState(false);
+  const [needsInstallFlow, setNeedsInstallFlow] = useState(false);
   const hasAttemptedSilentSync = useRef(false);
 
   useEffect(() => {
     let isActive = true;
 
     async function assessSupport() {
-      setShowIphoneTip(isLikelyIphone());
+      const iphone = isLikelyIphone();
+      const installed = isStandaloneMode();
+
+      setShowIphoneTip(iphone);
+      setNeedsInstallFlow(iphone && !installed);
 
       const supported =
         typeof window !== "undefined" &&
+        window.isSecureContext &&
         "Notification" in window &&
         "serviceWorker" in navigator &&
         "PushManager" in window;
@@ -105,6 +129,13 @@ export function EnableAlertsButton({
       if (!supported) {
         if (isActive) {
           setStatus("unsupported");
+        }
+        return;
+      }
+
+      if (iphone && !installed) {
+        if (isActive) {
+          setStatus("needs-install");
         }
         return;
       }
@@ -155,6 +186,12 @@ export function EnableAlertsButton({
     setStatus("enabling");
 
     try {
+      if (isLikelyIphone() && !isStandaloneMode()) {
+        setNeedsInstallFlow(true);
+        setStatus("needs-install");
+        return;
+      }
+
       const messaging = await getFirebaseMessagingClient();
 
       if (!messaging) {
@@ -209,10 +246,16 @@ export function EnableAlertsButton({
   const statusCopy = getStatusCopy(status, errorMessage);
 
   return (
-    <div className={`space-y-4 ${compact ? "" : "rounded-[2rem] bg-white/75 p-5 shadow-soft backdrop-blur sm:p-6"}`}>
+    <div
+      className={`space-y-4 ${
+        compact
+          ? ""
+          : "rounded-[2rem] bg-[#0e2a3a]/72 p-5 text-white shadow-soft backdrop-blur sm:p-6"
+      }`}
+    >
       <div className="space-y-2">
-        <h2 className="font-serif text-2xl text-primary">{title}</h2>
-        <p className="text-sm leading-6 text-foreground/75">{description}</p>
+        <h2 className="font-serif text-2xl text-[#f6d8a0]">{title}</h2>
+        <p className="text-sm leading-6 text-white/78">{description}</p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -220,16 +263,29 @@ export function EnableAlertsButton({
           type="button"
           onClick={() => void enableAlerts(false)}
           disabled={status === "enabling"}
-          className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex items-center justify-center rounded-full bg-[#d9b169] px-5 py-3 text-sm font-semibold text-[#122f41] shadow-card transition hover:bg-[#e3bd79] focus:outline-none focus:ring-2 focus:ring-[#d9b169]/45 focus:ring-offset-2 focus:ring-offset-[#0f3144] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {status === "enabling" ? "Enabling..." : status === "enabled" ? "Alerts Enabled" : "Enable Alerts"}
+          {status === "enabling"
+            ? "Enabling..."
+            : status === "enabled"
+              ? "Alerts Enabled"
+              : "Enable Alerts"}
         </button>
         <a
           href="/event-info"
-          className="inline-flex items-center justify-center rounded-full border border-primary/15 bg-white px-5 py-3 text-sm font-semibold text-primary transition hover:border-primary/30 hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background"
+          className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#0f3144]"
         >
           View Event Info
         </a>
+      </div>
+
+      <div className="rounded-[1.6rem] bg-white/6 p-4 text-sm text-white/78">
+        <p className="font-semibold uppercase tracking-[0.18em] text-[#f6d8a0]">
+          Support
+        </p>
+        <p className="mt-2 leading-6">
+          Best on Android Chrome. On iPhone, use Home Screen.
+        </p>
       </div>
 
       <StatusCard
@@ -240,13 +296,15 @@ export function EnableAlertsButton({
 
       {lastForegroundMessage ? (
         <StatusCard
-          title="Latest live message"
+          title="Latest update"
           description={lastForegroundMessage}
           tone="success"
         />
       ) : null}
 
-      {showIphoneTip ? <IphoneInstructions compact={compact} /> : null}
+      {showIphoneTip ? (
+        <IphoneInstructions compact={compact} requiresInstall={needsInstallFlow} />
+      ) : null}
     </div>
   );
 }
